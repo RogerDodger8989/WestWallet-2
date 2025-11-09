@@ -28,9 +28,7 @@ Skapa de filer som behövs för detta projekt.
 - Summeringar med inkomst/utgift-uppdelning
 - Sökfunktion i alla transaktioner
 - Negativa tal ska vara med ett "-" före samt i röd färg och två decimaler. Inkomst ska vara grön text med 2 decimaler.
-- Varje post som skapas ska ha ett ID nr som är unik och synkas mellan alla andra sidor. Tex på ID är A000001.
-Brevid ID där alla posterna visas samlade, där ska det vara en ikon som är grön när där finns bilder kopplade. Röd om där inte är något. När man trycker på den ikonen med en dropdown: Ladda upp bild, Radera alla bilder. Man ska även se alla bilder med en dropdown som ”ID-Bild 1” Bilderna ska sedan kunna hittas i fliken 
-Posterna ska synas i kolumner med följande rubriker: "Månad" som visas som ÅÅÅÅ-MM, "ID","Namn", "Typ", "Kategori", "Leverantör", "Belopp", "Notering". Längst till höger ska det finnas en redigeringsknapp och papperskorg för att radera post. 
+- Posterna ska synas i kolumner med följande rubriker: "Månad" som visas som ÅÅÅÅ-MM, "ID","Namn", "Typ", "Kategori", "Leverantör", "Belopp", "Notering". Längst till höger ska det finnas en redigeringsknapp och papperskorg för att radera post. 
 - På alla sidor där man ska välja ett datum ska man göra det på detta sätt: En  klickbar och tangentbordsnavigering för type="month" input-fält, som öppnar den inbyggda månadsväljaren i webbläsaren.
 - importera från banken xlsx eller cvs filerna
 	: skapa regler utifrån kolumnen "Beskrivning"
@@ -45,7 +43,7 @@ Posterna ska synas i kolumner med följande rubriker: "Månad" som visas som Å�
 Dropdown "Kategori" med en knapp som är ett plus där man kan addera, Dropdown "Leverantör" som är knuten till den kategori man valt med en knapp som är ett plus där man kan addera.
 - Om man redigerar en post så flyttas datan upp igen till där man skapar posten och knappen "lägg till" ändras till "Updatera post" med en knapp brevid "Avbryt redigering". Inaktiverad innebär att framtida betalningar ska försvinna.
 - Negativa tal ska vara med ett "-" före samt i röd färg och två decimaler. Inkomst ska vara grön text med 2 decimaler.
-- Brevid ID där alla posterna visas samlade, där ska det vara en ikon som är grön när där finns bilder kopplade. Röd om där inte är något. När man trycker på den ikonen med en dropdown: Ladda upp bild, Radera alla bilder. Man ska även se alla bilder med en dropdown som ”ID-Bild 1” Bilderna ska sedan kunna hittas i fliken 
+- Brevid ID där alla posterna visas samlade, där ska det vara en ikon som är grön när där finns bilder kopplade. Röd om där inte är något. När man trycker på den ikonen Ska det vara samma som på ekonomihantering.
 
 - Varje post som skapas ska ha ett ID nr som är unik och synkas mellan alla andra sidor. Tex på ID är A000001.
 - Posterna ska synas i kolumner med följande rubriker: "Start" som visas som ÅÅÅÅ-MM (Som bekrivet ovan, för type="month" input-fält), "Slut" som visas som ÅÅÅÅ-MM (Som bekrivet ovan, för type="month" input-fält) , "ID","Namn",  ”Frekvens”, "Kategori", "Leverantör", ”Ägare”, "Månad", "Notering". Längst till höger ska det finnas en redigeringsknapp, Inaktivera och papperskorg för att radera post. 
