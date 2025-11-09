@@ -8,6 +8,7 @@ import Wallets from './pages/Wallets';
 import { CategoriesSuppliers } from './pages/CategoriesSuppliers';
 import { Expenses } from './pages/Expenses';
 import { About } from './pages/About';
+import Agreements from './pages/Agreements';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, authNotice, clearNotice } = useAuth();
@@ -66,6 +67,14 @@ function App() {
           element={
             <PrivateRoute>
               <Expenses />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/agreements"
+          element={
+            <PrivateRoute>
+              <Agreements />
             </PrivateRoute>
           }
         />

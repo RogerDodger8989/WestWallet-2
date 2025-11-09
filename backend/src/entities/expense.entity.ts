@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Up
 import { CategoryEntity } from './category.entity';
 import { SupplierEntity } from './supplier.entity';
 import { UserEntity } from './user.entity';
+import { Agreement } from './agreement.entity';
 
 @Entity('expenses')
 export class ExpenseEntity {
@@ -59,6 +60,13 @@ export class ExpenseEntity {
 
   @Column()
   userId!: number;
+
+  @ManyToOne(() => Agreement, { nullable: true, eager: false })
+  @JoinColumn({ name: 'agreementId' })
+  agreement?: Agreement;
+
+  @Column({ nullable: true })
+  agreementId?: string;
 
   @CreateDateColumn()
   createdAt!: Date;

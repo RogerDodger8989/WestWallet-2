@@ -25,23 +25,56 @@ export function Navigation() {
 
             <div className="hidden md:flex space-x-6">
               <Link 
-                to="/" 
-                className={isActive('/') ? 'nav-link-active' : 'nav-link'}
+                to="/"
+                className={isActive('/') ? 'nav-link-active group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300' : 'nav-link group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300'}
+                aria-label="Plånböcker"
               >
-                Plånböcker
+                <svg className="w-6 h-6 text-primary-600 dark:text-primary-400 group-hover:text-primary-700 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a4 4 0 004 4h6a4 4 0 004-4V7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 3v4M8 3v4" />
+                </svg>
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.5rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg">
+                  Plånböcker
+                </span>
               </Link>
               <Link 
-                to="/categories" 
-                className={isActive('/categories') ? 'nav-link-active' : 'nav-link'}
+                to="/categories"
+                className={isActive('/categories') ? 'nav-link-active group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300' : 'nav-link group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300'}
+                aria-label="Kategorier & Leverantörer"
               >
-                Kategorier & Leverantörer
+                <svg className="w-6 h-6 text-primary-600 dark:text-primary-400 group-hover:text-primary-700 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.5rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg">
+                  Kategorier & Leverantörer
+                </span>
               </Link>
               <Link 
-                to="/expenses" 
-                className={isActive('/expenses') ? 'nav-link-active' : 'nav-link'}
+                to="/expenses"
+                className={isActive('/expenses') ? 'nav-link-active group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300' : 'nav-link group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300'}
+                aria-label="Ekonomihantering"
               >
-                Ekonomihantering
+                <svg className="w-6 h-6 text-primary-600 dark:text-primary-400 group-hover:text-primary-700 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.5rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg">
+                  Ekonomihantering
+                </span>
               </Link>
+                <Link 
+                  to="/agreements"
+                  className={isActive('/agreements') ? 'nav-link-active group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300' : 'nav-link group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300'}
+                  aria-label="Avtal & abonnemang"
+                >
+                  <svg className="w-6 h-6 text-primary-600 dark:text-primary-400 group-hover:text-primary-700 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a5 5 0 00-10 0v2M5 9h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6" />
+                  </svg>
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.5rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg">
+                    Avtal & abonnemang
+                  </span>
+                </Link>
             </div>
           </div>
 
@@ -72,13 +105,15 @@ export function Navigation() {
             {/* Print */}
             <button
               onClick={() => window.print()}
-              className="btn-secondary text-sm flex items-center gap-2"
-              title="Skriv ut"
+              className="group relative p-2 rounded-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:shadow-lg transition-all duration-300"
+              aria-label="Skriv ut"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-primary-600 dark:text-primary-400 group-hover:text-primary-700 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 9V2h12v7M6 18H5a2 2 0 01-2-2v-5a2 2 0 012-2h14a2 2 0 012 2v5a2 2 0 01-2 2h-1M6 14h12v8H6v-8z" />
               </svg>
-              Skriv ut
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.5rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg">
+                Skriv ut
+              </span>
             </button>
 
             <button
