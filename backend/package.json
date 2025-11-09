@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node dist/main.js",
+  "start": "node ../dist/backend/main.js",
     "prestart": "bash ./scripts/db-backup-auto.sh && bash ./scripts/db-prune.sh",
     "build": "tsc -p tsconfig.json",
     "predev": "bash ./scripts/db-backup-auto.sh && bash ./scripts/db-prune.sh",

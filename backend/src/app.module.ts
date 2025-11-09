@@ -9,6 +9,7 @@ import { WalletsModule } from './modules/wallets/wallets.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
+import { AgreementsModule } from './modules/agreements/agreements.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
     WalletsModule,
     CategoriesModule,
     SuppliersModule,
-    ExpensesModule,
+  ExpensesModule,
+  AgreementsModule,
   ],
   controllers: [RootController],
 })

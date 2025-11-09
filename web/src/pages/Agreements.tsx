@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Modal from '../components/Modal';
 import api from '../api/api';
 
 // Typdefinition för ett avtal/abonnemang
@@ -45,10 +46,17 @@ export default function Agreements() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
-  api.get('/agreements').then(res => setAgreements(res.data));
-  api.get('/categories').then(res => setCategories(res.data));
-  api.get('/suppliers').then(res => setSuppliers(res.data));
+    api.get('/agreements').then(res => setAgreements(res.data));
+    api.get('/categories').then(res => setCategories(res.data));
+    api.get('/suppliers').then(res => setSuppliers(res.data));
   }, []);
+
+  // Modal state for category
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  // Modal state for supplier
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState("");
 
   // Hantera formulärändringar
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
@@ -113,22 +121,80 @@ export default function Agreements() {
               <option key={cat.id} value={cat.name}>{cat.name}</option>
             ))}
           </select>
-          <button type="button" className="btn-secondary px-2 py-1" title="Lägg till ny kategori" onClick={() => alert('Lägg till ny kategori-modal (implementera modal!)')}>+
+          <button type="button" className="btn-secondary px-2 py-1" title="Lägg till ny kategori" onClick={() => setShowCategoryModal(true)}>+
           </button>
+          {showCategoryModal && (
+            <Modal onClose={() => setShowCategoryModal(false)}>
+              <div className="p-2">
+                <h2 className="text-lg font-bold mb-2">Lägg till ny kategori</h2>
+                <input
+                  type="text"
+                  className="input-field w-full mb-2"
+                  placeholder="Kategorinamn"
+                  value={newCategoryName}
+                  onChange={e => setNewCategoryName(e.target.value)}
+                />
+                <div className="flex gap-2 justify-end">
+                  <button className="btn-secondary" onClick={() => setShowCategoryModal(false)}>Avbryt</button>
+                  <button className="btn-primary" onClick={async () => {
+                    if (!newCategoryName.trim()) return;
+                    const res = await api.post('/categories', { name: newCategoryName });
+                    setShowCategoryModal(false);
+                    setNewCategoryName("");
+                    const cats = await api.get('/categories');
+                    setCategories(cats.data);
+                    setForm(prev => ({ ...prev, category: newCategoryName }));
+                  }}>Spara</button>
+                </div>
+              </div>
+            </Modal>
+          )}
         </div>
-        <select
-          name="supplier"
-          value={form.supplier || ''}
-          onChange={handleChange}
-          className="input-field"
-          required
-          disabled={!form.category}
-        >
-          <option value="">{form.category ? 'Välj leverantör' : 'Välj kategori först'}</option>
-          {filteredSuppliers.map(sup => (
-            <option key={sup.id} value={sup.name}>{sup.name}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <select
+            name="supplier"
+            value={form.supplier || ''}
+            onChange={handleChange}
+            className="input-field"
+            required
+            disabled={!form.category}
+          >
+            <option value="">{form.category ? 'Välj leverantör' : 'Välj kategori först'}</option>
+            {filteredSuppliers.map(sup => (
+              <option key={sup.id} value={sup.name}>{sup.name}</option>
+            ))}
+          </select>
+          <button type="button" className="btn-secondary px-2 py-1" title="Lägg till ny leverantör" onClick={() => setShowSupplierModal(true)}>+</button>
+          {showSupplierModal && (
+            <Modal onClose={() => setShowSupplierModal(false)}>
+              <div className="p-2">
+                <h2 className="text-lg font-bold mb-2">Lägg till ny leverantör</h2>
+                <input
+                  type="text"
+                  className="input-field w-full mb-2"
+                  placeholder="Leverantörsnamn"
+                  value={newSupplierName}
+                  onChange={e => setNewSupplierName(e.target.value)}
+                />
+                <div className="flex gap-2 justify-end">
+                  <button className="btn-secondary" onClick={() => setShowSupplierModal(false)}>Avbryt</button>
+                  <button className="btn-primary" onClick={async () => {
+                    if (!newSupplierName.trim() || !form.category) return;
+                    // Hämta kategori-id
+                    const cat = categories.find(c => c.name === form.category);
+                    if (!cat) return;
+                    await api.post('/suppliers', { name: newSupplierName, categoryId: cat.id });
+                    setShowSupplierModal(false);
+                    setNewSupplierName("");
+                    const sups = await api.get('/suppliers');
+                    setSuppliers(sups.data);
+                    setForm(prev => ({ ...prev, supplier: newSupplierName }));
+                  }}>Spara</button>
+                </div>
+              </div>
+            </Modal>
+          )}
+        </div>
         <input name="owner" value={form.owner || ''} onChange={handleChange} placeholder="Står på (ägare)" className="input-field" />
         <input name="startMonth" type="month" value={form.startMonth || ''} onChange={handleChange} className="input-field" required />
         <input name="endMonth" type="month" value={form.endMonth || ''} onChange={handleChange} className="input-field" />
