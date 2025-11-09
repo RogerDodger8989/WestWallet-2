@@ -27,10 +27,9 @@ export class AgreementsService {
     const freq = agreement.frequency;
     const cost = agreement.costPerMonth;
     const expenses: ExpenseEntity[] = [];
-    // Enkel logik för att generera poster (kan utökas)
     let current = start;
     while (current <= end) {
-      expenses.push(this.expenseRepo.create({
+      const expense = this.expenseRepo.create({
         name: agreement.name,
         amount: cost,
         type: 'expense',
@@ -40,7 +39,19 @@ export class AgreementsService {
         categoryId: agreement.categoryId,
         supplierId: agreement.supplierId,
         userId: (agreement as any).userId,
-      }));
+      });
+      expenses.push(expense);
+      // Logga expense för felsökning
+      console.log('[Expense from Agreement]', {
+        name: expense.name,
+        amount: expense.amount,
+        type: expense.type,
+        month: expense.month,
+        agreementId: expense.agreementId,
+        categoryId: expense.categoryId,
+        supplierId: expense.supplierId,
+        userId: expense.userId,
+      });
       // Nästa månad/kvartal/halvår/år
       const [year, month] = current.split('-').map(Number);
       let nextMonth = month;
