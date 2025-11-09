@@ -1,0 +1,46 @@
+{
+  "name": "@west-wallet/backend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node dist/main.js",
+    "prestart": "bash ./scripts/db-backup-auto.sh && bash ./scripts/db-prune.sh",
+    "build": "tsc -p tsconfig.json",
+    "predev": "bash ./scripts/db-backup-auto.sh && bash ./scripts/db-prune.sh",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/main.ts",
+    "seed": "ts-node-dev --transpile-only ./src/seed.ts",
+    "db:backup": "bash ./scripts/db-backup.sh",
+    "db:restore:latest": "bash ./scripts/db-restore-latest.sh",
+    "db:list-backups": "bash ./scripts/db-list.sh",
+    "db:prune-backups": "bash ./scripts/db-prune.sh"
+    ,"db:migrate": "ts-node-dev --transpile-only ./src/run-migrations.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.2.0",
+    "@nestjs/core": "^10.2.0",
+    "@nestjs/jwt": "^10.0.0",
+    "@nestjs/passport": "^10.0.0",
+    "@nestjs/platform-express": "^10.4.20",
+    "@nestjs/typeorm": "^10.0.0",
+    "@types/multer": "^2.0.0",
+    "@types/uuid": "^11.0.0",
+    "bcryptjs": "^2.4.3",
+    "csv-parse": "^6.1.0",
+    "multer": "^2.0.2",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17",
+    "uuid": "^13.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/passport-jwt": "^3.0.7",
+    "@types/bcryptjs": "^2.4.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.0"
+  }
+}
