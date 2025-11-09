@@ -21,6 +21,8 @@ const initialAgreements: Agreement[] = [];
 
 export default function Agreements() {
   const [agreements, setAgreements] = useState<Agreement[]>(initialAgreements);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [suppliers, setSuppliers] = useState<{ id: number; name: string; categoryId: number }[]>([]);
   const [form, setForm] = useState<Partial<Agreement>>({
     name: '',
     category: '',
@@ -33,10 +35,19 @@ export default function Agreements() {
     notes: '',
     status: 'aktiv',
   });
+  // Filtrera leverantörer baserat på vald kategori
+  const filteredSuppliers = form.category
+    ? suppliers.filter(sup => {
+        const cat = categories.find(c => c.name === form.category);
+        return cat && sup.categoryId === cat.id;
+      })
+    : [];
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
-    api.get('/agreements').then(res => setAgreements(res.data));
+  api.get('/agreements').then(res => setAgreements(res.data));
+  api.get('/categories').then(res => setCategories(res.data));
+  api.get('/suppliers').then(res => setSuppliers(res.data));
   }, []);
 
   // Hantera formulärändringar
@@ -90,9 +101,34 @@ export default function Agreements() {
     <div className="card p-6">
       <h2 className="text-xl font-bold mb-4">Avtal & abonnemang</h2>
       <form className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
-        <input name="name" value={form.name || ''} onChange={handleChange} placeholder="Namn" className="input-field" required />
-        <input name="category" value={form.category || ''} onChange={handleChange} placeholder="Kategori" className="input-field" required />
-        <input name="supplier" value={form.supplier || ''} onChange={handleChange} placeholder="Leverantör" className="input-field" required />
+        <div className="flex items-center gap-2">
+          <input name="name" value={form.name || ''} onChange={handleChange} placeholder="Avtal" className="input-field" required />
+          <button type="button" className="btn-secondary px-2 py-1" title="Lägg till nytt avtal" onClick={() => alert('Lägg till nytt avtal-modal (implementera modal!)')}>+
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <select name="category" value={form.category || ''} onChange={handleChange} className="input-field" required>
+            <option value="">Välj kategori</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.name}>{cat.name}</option>
+            ))}
+          </select>
+          <button type="button" className="btn-secondary px-2 py-1" title="Lägg till ny kategori" onClick={() => alert('Lägg till ny kategori-modal (implementera modal!)')}>+
+          </button>
+        </div>
+        <select
+          name="supplier"
+          value={form.supplier || ''}
+          onChange={handleChange}
+          className="input-field"
+          required
+          disabled={!form.category}
+        >
+          <option value="">{form.category ? 'Välj leverantör' : 'Välj kategori först'}</option>
+          {filteredSuppliers.map(sup => (
+            <option key={sup.id} value={sup.name}>{sup.name}</option>
+          ))}
+        </select>
         <input name="owner" value={form.owner || ''} onChange={handleChange} placeholder="Står på (ägare)" className="input-field" />
         <input name="startMonth" type="month" value={form.startMonth || ''} onChange={handleChange} className="input-field" required />
         <input name="endMonth" type="month" value={form.endMonth || ''} onChange={handleChange} className="input-field" />
@@ -104,13 +140,13 @@ export default function Agreements() {
           <option value="Halvårsvis">Halvårsvis</option>
           <option value="Årligen">Årligen</option>
         </select>
-        <textarea name="notes" value={form.notes || ''} onChange={handleChange} placeholder="Anteckningar" className="input-field" />
         <select name="status" value={form.status || 'aktiv'} onChange={handleChange} className="input-field">
           <option value="aktiv">Aktiv</option>
           <option value="avslutad">Avslutad</option>
           <option value="undertecknad">Undertecknad</option>
           <option value="väntar på motpart">Väntar på motpart</option>
         </select>
+        <textarea name="notes" value={form.notes || ''} onChange={handleChange} placeholder="Anteckningar" className="input-field" />
         <div className="flex gap-2 mt-2">
           <button type="submit" className="btn-primary">
             {editingId ? 'Uppdatera post' : 'Lägg till'}
@@ -122,43 +158,52 @@ export default function Agreements() {
           )}
         </div>
       </form>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Namn</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Frekvens</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Leverantör</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ägare</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kostnad/mån</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notering</th>
-            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Åtgärder</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {agreements.map(a => (
-            <tr key={a.id}>
-              <td className="px-3 py-2">{a.startMonth}</td>
-              <td className="px-3 py-2">{a.endMonth}</td>
-              <td className="px-3 py-2 font-mono">{a.id}</td>
-              <td className="px-3 py-2">{a.name}</td>
-              <td className="px-3 py-2">{a.frequency}</td>
-              <td className="px-3 py-2">{a.category}</td>
-              <td className="px-3 py-2">{a.supplier}</td>
-              <td className="px-3 py-2">{a.owner}</td>
-              <td className="px-3 py-2">{a.costPerMonth} kr</td>
-              <td className="px-3 py-2">{a.status}</td>
-              <td className="px-3 py-2">{a.notes}</td>
-              <td className="px-3 py-2 flex gap-2">
-                <button className="btn-secondary" onClick={() => handleEdit(a.id)}>Redigera</button>
-                <button className="btn-danger" onClick={() => handleDelete(a.id)}>Radera</button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-300 rounded-lg shadow bg-white dark:bg-gray-900">
+          <thead className="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avtal</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Leverantör</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Frekvens</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ägare</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kostnad/mån</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Åtgärder</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {agreements.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-3 py-6 text-center text-gray-400">Inga avtal eller abonnemang har lagts till ännu.</td>
+              </tr>
+            ) : agreements.map(a => (
+              <tr key={a.id} className="group hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors">
+                <td className="px-3 py-2 font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a5 5 0 00-10 0v2M5 9h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6" /></svg>
+                  <span>{a.name}</span>
+                </td>
+                <td className="px-3 py-2">{a.category}</td>
+                <td className="px-3 py-2">{a.supplier}</td>
+                <td className="px-3 py-2">{a.frequency}</td>
+                <td className="px-3 py-2">{a.owner}</td>
+                <td className="px-3 py-2">{a.costPerMonth} kr</td>
+                <td className="px-3 py-2">
+                  <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${a.status === 'aktiv' ? 'bg-green-100 text-green-700' : a.status === 'avslutad' ? 'bg-gray-200 text-gray-600' : 'bg-yellow-100 text-yellow-800'}`}>{a.status}</span>
+                </td>
+                <td className="px-3 py-2 flex gap-2">
+                  <button className="btn-secondary group-hover:bg-primary-100 group-hover:text-primary-700 transition-colors duration-200" onClick={() => handleEdit(a.id)} title="Redigera avtal">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0l1.586 1.586a1 1 0 010 1.414L11 15l-4 1 1-4z" /></svg>
+                  </button>
+                  <button className="btn-danger group-hover:bg-red-100 group-hover:text-red-700 transition-colors duration-200" onClick={() => handleDelete(a.id)} title="Radera avtal">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
