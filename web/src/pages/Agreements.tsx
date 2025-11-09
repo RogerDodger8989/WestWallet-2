@@ -170,12 +170,16 @@ export default function Agreements() {
         <table className="min-w-full divide-y divide-gray-300 rounded-lg shadow bg-white dark:bg-gray-900">
           <thead className="bg-gray-100 dark:bg-gray-800">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avtal</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Start-M</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Slut-M</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Frekvens</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ägare</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Leverantör</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Frekvens</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ägare</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kostnad/mån</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notering</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Bilder</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Åtgärder</th>
             </tr>
@@ -183,23 +187,54 @@ export default function Agreements() {
           <tbody>
             {agreements.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-3 py-6 text-center text-gray-400">Inga avtal eller abonnemang har lagts till ännu.</td>
+                <td colSpan={12} className="px-3 py-6 text-center text-gray-400">Inga avtal eller abonnemang har lagts till ännu.</td>
               </tr>
             ) : agreements.map(a => (
               <tr key={a.id} className="group hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors">
-                <td className="px-3 py-2 font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a5 5 0 00-10 0v2M5 9h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6" /></svg>
-                  <span>{a.name}</span>
+                <td className="px-3 py-2">{a.startMonth}</td>
+                <td className="px-3 py-2">{a.endMonth}</td>
+                <td className="px-3 py-2 flex items-center justify-center">
+                  <span className="relative group">
+                    <span className={`inline-block w-6 h-6 rounded-full flex items-center justify-center font-bold text-white ${a.frequency === 'Månadsvis' ? 'bg-blue-500' : a.frequency === 'Kvartalsvis' ? 'bg-purple-500' : a.frequency === 'Halvårsvis' ? 'bg-teal-500' : 'bg-orange-500'}`}>{a.frequency === 'Månadsvis' ? 'M' : a.frequency === 'Kvartalsvis' ? 'K' : a.frequency === 'Halvårsvis' ? 'H' : 'Å'}</span>
+                    <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.2rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg">
+                      {a.frequency}
+                    </span>
+                  </span>
                 </td>
+                <td className="px-3 py-2 font-mono text-xs text-gray-500">{a.id}</td>
+                <td className="px-3 py-2">{a.owner}</td>
                 <td className="px-3 py-2">{a.category}</td>
                 <td className="px-3 py-2">{a.supplier}</td>
-                <td className="px-3 py-2">{a.frequency}</td>
-                <td className="px-3 py-2">{a.owner}</td>
                 <td className="px-3 py-2">{a.costPerMonth} kr</td>
-                <td className="px-3 py-2">
-                  <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${a.status === 'aktiv' ? 'bg-green-100 text-green-700' : a.status === 'avslutad' ? 'bg-gray-200 text-gray-600' : 'bg-yellow-100 text-yellow-800'}`}>{a.status}</span>
+                <td className="px-3 py-2 flex items-center justify-center">
+                  <span className="relative group">
+                    <button className="hover:text-primary-600" title="Visa notering">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                    {a.notes && (
+                      <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.2rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg">
+                        {a.notes}
+                      </span>
+                    )}
+                  </span>
                 </td>
-                <td className="px-3 py-2 flex gap-2">
+                <td className="px-3 py-2 flex items-center justify-center">
+                  <span className="relative group">
+                    <button className="hover:text-primary-600" title="Visa bilder">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4-4a3 3 0 014 0l4 4M4 8h.01" /></svg>
+                    </button>
+                    {/* Tooltip för bilder kan visas här om bilder finns */}
+                  </span>
+                </td>
+                <td className="px-3 py-2 flex items-center justify-center">
+                  <span className="relative group">
+                    <span className={`inline-block w-6 h-6 rounded-full flex items-center justify-center font-bold text-white ${a.status === 'aktiv' ? 'bg-green-500' : a.status === 'avslutad' ? 'bg-black' : a.status === 'undertecknad' ? 'bg-red-500' : 'bg-orange-500'}`}></span>
+                    <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.2rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg">
+                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                    </span>
+                  </span>
+                </td>
+                <td className="px-3 py-2 flex gap-2 justify-center">
                   <button className="btn-secondary group-hover:bg-primary-100 group-hover:text-primary-700 transition-colors duration-200" onClick={() => handleEdit(a.id)} title="Redigera avtal">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0l1.586 1.586a1 1 0 010 1.414L11 15l-4 1 1-4z" /></svg>
                   </button>
