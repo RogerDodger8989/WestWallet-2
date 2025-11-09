@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AgreementsService } from './agreements.service';
 import { Agreement } from '../../entities/agreement.entity';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('agreements')
 export class AgreementsController {
   constructor(private readonly agreementsService: AgreementsService) {}
@@ -12,12 +14,16 @@ export class AgreementsController {
   }
 
   @Post()
-  async create(@Body() data: Partial<Agreement>): Promise<Agreement> {
+  async create(@Request() req: any, @Body() data: Partial<Agreement>): Promise<Agreement> {
+    // Associate agreement with the authenticated user
+    (data as any).userId = req.user?.sub;
     return this.agreementsService.createAgreement(data);
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: Partial<Agreement>): Promise<Agreement> {
+  async update(@Request() req: any, @Param('id') id: string, @Body() data: Partial<Agreement>): Promise<Agreement> {
+    // Ensure ownership remains with the authenticated user
+    (data as any).userId = req.user?.sub;
     return this.agreementsService.updateAgreement(id, data);
   }
 

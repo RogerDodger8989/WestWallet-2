@@ -42,5 +42,27 @@
     "@types/bcryptjs": "^2.4.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.0"
+  },
+  "migrations": {
+    "tableName": "migrations",
+    "directory": "src/migrations",
+    "pattern": ".+\\.(ts|js)$",
+    "extension": "ts"
+  },
+  "cli": {
+    "migrations": "src/migrations",
+    "entities": "src/entities"
+  },
+  "database": {
+    "type": "sqlite",
+    "database": "db.sqlite",
+    "synchronize": true,
+    "logging": true,
+    "entities": [
+      "dist/**/*.entity{.ts,.js}"
+    ],
+    "migrations": [
+      "dist/migrations/*{.ts,.js}"
+    ]
   }
 }

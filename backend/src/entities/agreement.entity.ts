@@ -52,7 +52,11 @@ export class Agreement {
   status!: 'aktiv' | 'avslutad' | 'undertecknad' | 'väntar på motpart';
 
   @ManyToOne(() => UserEntity, { nullable: true })
+  @JoinColumn({ name: 'userId' })
   user?: UserEntity;
+
+  @Column({ nullable: true })
+  userId?: number;
 
   @OneToMany(() => ExpenseEntity, expense => expense.agreement)
   expenses!: ExpenseEntity[];

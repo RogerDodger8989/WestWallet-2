@@ -5,17 +5,22 @@ import api from '../api/api';
 // Typdefinition för ett avtal/abonnemang
 interface Agreement {
   id: string;
+  displayId?: string;
   name: string;
-  category: string;
-  supplier: string;
-  owner: string;
-  startMonth: string;
-  endMonth: string;
+  category?: { id: number; name: string } | string;
+  supplier?: { id: number; name: string } | string;
+  owner?: string;
+  startMonth?: string;
+  endMonth?: string;
   monthsCount?: number;
-  costPerMonth: number;
-  frequency: 'Månadsvis' | 'Kvartalsvis' | 'Halvårsvis' | 'Årligen';
+  costPerMonth?: number;
+  frequency?: 'Månadsvis' | 'Kvartalsvis' | 'Halvårsvis' | 'Årligen';
   notes?: string;
-  status: 'aktiv' | 'avslutad' | 'undertecknad' | 'väntar på motpart';
+  images?: string[];
+  status?: 'aktiv' | 'avslutad' | 'undertecknad' | 'väntar på motpart';
+  categoryId?: number;
+  supplierId?: number;
+  userId?: number;
 }
 
 const initialAgreements: Agreement[] = [];
@@ -24,7 +29,20 @@ export default function Agreements() {
   const [agreements, setAgreements] = useState<Agreement[]>(initialAgreements);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [suppliers, setSuppliers] = useState<{ id: number; name: string; categoryId: number }[]>([]);
-  const [form, setForm] = useState<Partial<Agreement>>({
+  // form uses simple primitive values for selects/inputs
+  const [form, setForm] = useState<{
+    name?: string;
+    category?: string;
+    supplier?: string;
+    owner?: string;
+    startMonth?: string;
+    endMonth?: string;
+    monthsCount?: number | string;
+    costPerMonth?: number | string;
+    frequency?: string;
+    notes?: string;
+    status?: string;
+  }>({
     name: '',
     category: '',
     supplier: '',
@@ -57,6 +75,9 @@ export default function Agreements() {
   // Modal state for supplier
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [newSupplierName, setNewSupplierName] = useState("");
+  // Local modals for notes/images
+  const [noteModalAgreement, setNoteModalAgreement] = useState<Agreement | null>(null);
+  const [imageModalAgreement, setImageModalAgreement] = useState<Agreement | null>(null);
 
   // Hantera formulärändringar
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
@@ -87,6 +108,8 @@ export default function Agreements() {
       const res = await api.get('/agreements');
       setAgreements(res.data);
     }, 400);
+    // Notify other parts of the app (expenses) to reload their data
+    try { window.dispatchEvent(new Event('expenses:reload')); } catch (e) {}
     setEditingId(null);
     setForm({
       name: '',
@@ -106,7 +129,19 @@ export default function Agreements() {
   function handleEdit(id: string) {
     const agreement = agreements.find(a => a.id === id);
     if (agreement) {
-      setForm(agreement);
+      setForm({
+        name: agreement.name || '',
+        category: typeof agreement.category === 'string' ? agreement.category : agreement.category?.name || '',
+        supplier: typeof agreement.supplier === 'string' ? agreement.supplier : agreement.supplier?.name || '',
+        owner: agreement.owner || '',
+        startMonth: agreement.startMonth || '',
+        endMonth: agreement.endMonth || '',
+        monthsCount: agreement.monthsCount || '',
+        costPerMonth: agreement.costPerMonth || '',
+        frequency: agreement.frequency || 'Månadsvis',
+        notes: agreement.notes || '',
+        status: agreement.status || 'aktiv',
+      });
       setEditingId(id);
     }
   }
@@ -151,7 +186,7 @@ export default function Agreements() {
                   <button className="btn-secondary" onClick={() => setShowCategoryModal(false)}>Avbryt</button>
                   <button className="btn-primary" onClick={async () => {
                     if (!newCategoryName.trim()) return;
-                    const res = await api.post('/categories', { name: newCategoryName });
+                    await api.post('/categories', { name: newCategoryName });
                     setShowCategoryModal(false);
                     setNewCategoryName("");
                     const cats = await api.get('/categories');
@@ -282,14 +317,14 @@ export default function Agreements() {
                 </td>
                 <td className="px-3 py-2 font-mono text-xs text-gray-500">{a.displayId || a.id}</td>
                 <td className="px-3 py-2">{a.owner}</td>
-                <td className="px-3 py-2">{a.category?.name || '-'}</td>
-                <td className="px-3 py-2">{a.supplier?.name || '-'}</td>
+                <td className="px-3 py-2">{typeof a.category === 'string' ? a.category : a.category?.name || '-'}</td>
+                <td className="px-3 py-2">{typeof a.supplier === 'string' ? a.supplier : a.supplier?.name || '-'}</td>
                 <td className="px-3 py-2">{a.costPerMonth} kr</td>
                 <td className="px-3 py-2 flex items-center justify-center">
                   <span className="relative group">
                     <button
                       type="button"
-                      onClick={() => setNoteModalExpense(a)}
+                      onClick={() => setNoteModalAgreement(a)}
                       title={a.notes && a.notes.length > 0 ? 'Visa/ändra anteckning' : 'Lägg till anteckning'}
                       className={`inline-flex items-center gap-1 pl-0 pr-2 py-1 rounded-md ${
                         a.notes && a.notes.length > 0
@@ -306,7 +341,7 @@ export default function Agreements() {
                   <span className="relative group">
                     <button
                       type="button"
-                      onClick={() => setImageModalExpense(a)}
+                      onClick={() => setImageModalAgreement(a)}
                       className={`inline-flex items-center gap-1 pl-0 pr-2 py-1 rounded-md ${
                         a.images && a.images.length > 0
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
@@ -326,7 +361,7 @@ export default function Agreements() {
                   <span className="relative group">
                     <span className={`inline-block w-6 h-6 rounded-full flex items-center justify-center font-bold text-white ${a.status === 'aktiv' ? 'bg-green-500' : a.status === 'avslutad' ? 'bg-black' : a.status === 'undertecknad' ? 'bg-red-500' : 'bg-orange-500'}`}></span>
                     <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.2rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg">
-                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                      {a.status ? (typeof a.status === 'string' ? a.status.charAt(0).toUpperCase() + a.status.slice(1) : '-') : '-'}
                     </span>
                   </span>
                 </td>
@@ -351,6 +386,35 @@ export default function Agreements() {
           </tbody>
         </table>
       </div>
+      {/* Note Modal for agreements */}
+      {noteModalAgreement && (
+        <Modal onClose={() => setNoteModalAgreement(null)}>
+          <div className="p-4">
+            <h3 className="text-lg font-semibold">Anteckning – {noteModalAgreement.displayId || noteModalAgreement.id}</h3>
+            <p className="mt-2 whitespace-pre-wrap">{noteModalAgreement.notes || ''}</p>
+            <div className="mt-4 flex justify-end">
+              <button className="btn-secondary" onClick={() => setNoteModalAgreement(null)}>Stäng</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Images Modal for agreements (read-only) */}
+      {imageModalAgreement && (
+        <Modal onClose={() => setImageModalAgreement(null)}>
+          <div className="p-4">
+            <h3 className="text-lg font-semibold">Bilder – {imageModalAgreement.displayId || imageModalAgreement.id}</h3>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {(imageModalAgreement.images || []).map((img, idx) => (
+                <div key={idx} className="border rounded p-2 text-sm">{img}</div>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button className="btn-secondary" onClick={() => setImageModalAgreement(null)}>Stäng</button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

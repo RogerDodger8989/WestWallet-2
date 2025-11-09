@@ -37,9 +37,9 @@ export class AgreementsService {
         month: current,
         notes: agreement.notes,
         agreementId: agreement.id,
-        // categoryId and supplierId should be set if available
-        ...(agreement.category ? { categoryId: Number(agreement.category) } : {}),
-        ...(agreement.supplier ? { supplierId: Number(agreement.supplier) } : {}),
+        categoryId: agreement.categoryId,
+        supplierId: agreement.supplierId,
+        userId: (agreement as any).userId,
       }));
       // Nästa månad/kvartal/halvår/år
       const [year, month] = current.split('-').map(Number);

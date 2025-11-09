@@ -226,6 +226,13 @@ export function Expenses() {
     }
   };
 
+  // Listen for external reload requests (e.g. when agreements create expenses)
+  useEffect(() => {
+    const onReload = () => { loadExpenses(); };
+    window.addEventListener('expenses:reload', onReload);
+    return () => window.removeEventListener('expenses:reload', onReload);
+  }, []);
+
   const loadBudgets = async () => {
     try {
       const res = await api.get('/budgets/category');
