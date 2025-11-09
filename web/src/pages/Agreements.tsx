@@ -146,9 +146,17 @@ export default function Agreements() {
           <option value="undertecknad">Undertecknad</option>
           <option value="väntar på motpart">Väntar på motpart</option>
         </select>
-        <textarea name="notes" value={form.notes || ''} onChange={handleChange} placeholder="Anteckningar" className="input-field" />
-        <div className="flex gap-2 mt-2">
-          <button type="submit" className="btn-primary">
+        <div className="col-span-1 md:col-span-2">
+          <textarea name="notes" value={form.notes || ''} onChange={handleChange} placeholder="Anteckningar" className="input-field w-full" />
+        </div>
+        <div className="col-span-1 md:col-span-2 flex gap-2 mt-4">
+          <button
+            type="submit"
+            className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg shadow flex items-center gap-2 transition-colors duration-200 w-full justify-center"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
             {editingId ? 'Uppdatera post' : 'Lägg till'}
           </button>
           {editingId && (
