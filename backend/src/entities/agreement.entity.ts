@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { CategoryEntity } from './category.entity';
+import { SupplierEntity } from './supplier.entity';
 import { UserEntity } from './user.entity';
 import { ExpenseEntity } from './expense.entity';
 
@@ -10,11 +12,20 @@ export class Agreement {
   @Column()
   name!: string;
 
-  @Column()
-  category!: string;
+
+  @ManyToOne(() => CategoryEntity, { nullable: false, eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category!: CategoryEntity;
 
   @Column()
-  supplier!: string;
+  categoryId!: number;
+
+  @ManyToOne(() => SupplierEntity, { nullable: false, eager: true })
+  @JoinColumn({ name: 'supplierId' })
+  supplier!: SupplierEntity;
+
+  @Column()
+  supplierId!: number;
 
   @Column({ nullable: true })
   owner!: string;

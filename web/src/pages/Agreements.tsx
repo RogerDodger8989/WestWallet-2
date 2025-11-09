@@ -67,13 +67,26 @@ export default function Agreements() {
   // Lägg till eller uppdatera avtal
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Hitta id för kategori och leverantör
+    const categoryObj = categories.find(c => c.name === form.category);
+    const supplierObj = suppliers.find(s => s.name === form.supplier && (!categoryObj || s.categoryId === categoryObj.id));
+    const agreementData: any = {
+      ...form,
+      categoryId: categoryObj ? categoryObj.id : undefined,
+      supplierId: supplierObj ? supplierObj.id : undefined,
+    };
+    // Ta bort namn-fälten ur payloaden
+    delete agreementData.category;
+    delete agreementData.supplier;
     if (editingId) {
-      await api.put(`/agreements/${editingId}`, form);
+      await api.put(`/agreements/${editingId}`, agreementData);
     } else {
-      await api.post('/agreements', form);
+      await api.post('/agreements', agreementData);
     }
-    const res = await api.get('/agreements');
-    setAgreements(res.data);
+    setTimeout(async () => {
+      const res = await api.get('/agreements');
+      setAgreements(res.data);
+    }, 400);
     setEditingId(null);
     setForm({
       name: '',
@@ -267,29 +280,46 @@ export default function Agreements() {
                     </span>
                   </span>
                 </td>
-                <td className="px-3 py-2 font-mono text-xs text-gray-500">{a.id}</td>
+                <td className="px-3 py-2 font-mono text-xs text-gray-500">{a.displayId || a.id}</td>
                 <td className="px-3 py-2">{a.owner}</td>
-                <td className="px-3 py-2">{a.category}</td>
-                <td className="px-3 py-2">{a.supplier}</td>
+                <td className="px-3 py-2">{a.category?.name || '-'}</td>
+                <td className="px-3 py-2">{a.supplier?.name || '-'}</td>
                 <td className="px-3 py-2">{a.costPerMonth} kr</td>
                 <td className="px-3 py-2 flex items-center justify-center">
                   <span className="relative group">
-                    <button className="hover:text-primary-600" title="Visa notering">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <button
+                      type="button"
+                      onClick={() => setNoteModalExpense(a)}
+                      title={a.notes && a.notes.length > 0 ? 'Visa/ändra anteckning' : 'Lägg till anteckning'}
+                      className={`inline-flex items-center gap-1 pl-0 pr-2 py-1 rounded-md ${
+                        a.notes && a.notes.length > 0
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16h8M8 12h8M8 8h8M5 6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6z"/></svg>
+                      <span className="text-xs">{a.notes && a.notes.length > 0 ? '1' : '0'}</span>
                     </button>
-                    {a.notes && (
-                      <span className="absolute left-1/2 -translate-x-1/2 bottom-[-2.2rem] px-2 py-1 rounded bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-2 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg">
-                        {a.notes}
-                      </span>
-                    )}
                   </span>
                 </td>
                 <td className="px-3 py-2 flex items-center justify-center">
                   <span className="relative group">
-                    <button className="hover:text-primary-600" title="Visa bilder">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4-4a3 3 0 014 0l4 4M4 8h.01" /></svg>
+                    <button
+                      type="button"
+                      onClick={() => setImageModalExpense(a)}
+                      className={`inline-flex items-center gap-1 pl-0 pr-2 py-1 rounded-md ${
+                        a.images && a.images.length > 0
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                      }`}
+                      title="Visa bilder"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {a.images && a.images.length > 0 ? a.images.length : '0'}
                     </button>
-                    {/* Tooltip för bilder kan visas här om bilder finns */}
                   </span>
                 </td>
                 <td className="px-3 py-2 flex items-center justify-center">
@@ -301,11 +331,19 @@ export default function Agreements() {
                   </span>
                 </td>
                 <td className="px-3 py-2 flex gap-2 justify-center">
-                  <button className="btn-secondary group-hover:bg-primary-100 group-hover:text-primary-700 transition-colors duration-200" onClick={() => handleEdit(a.id)} title="Redigera avtal">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0l1.586 1.586a1 1 0 010 1.414L11 15l-4 1 1-4z" /></svg>
+                  <button
+                    onClick={() => handleEdit(a.id)}
+                    title="Redigera"
+                    className="p-2 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m-2 4h2m-5 4h6m2 6H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a2 2 0 011.414.586l4.414 4.414A2 2 0 0119 9.414V19a2 2 0 01-2 2z"/></svg>
                   </button>
-                  <button className="btn-danger group-hover:bg-red-100 group-hover:text-red-700 transition-colors duration-200" onClick={() => handleDelete(a.id)} title="Radera avtal">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  <button
+                    onClick={() => handleDelete(a.id)}
+                    title="Ta bort"
+                    className="p-2 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
                   </button>
                 </td>
               </tr>
